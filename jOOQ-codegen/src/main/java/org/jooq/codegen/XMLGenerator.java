@@ -47,7 +47,9 @@ import static org.jooq.util.xml.jaxb.TableConstraintType.UNIQUE;
 
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jooq.SortOrder;
 import org.jooq.meta.CatalogDefinition;
@@ -100,7 +102,7 @@ public class XMLGenerator extends AbstractGenerator {
     }
 
     @Override
-    public void generate0(Database db) {
+    public Set<String> generate0(Database db) {
         logDatabaseParameters(db);
         log.info("");
         logGenerationRemarks(db);
@@ -405,6 +407,12 @@ public class XMLGenerator extends AbstractGenerator {
         MiniJAXB.marshal(is, writer);
         out.print(writer.toString());
         out.close();
+
+        String filename = out.file().getPath();
+        Set<String> outFiles = new HashSet<>();
+        outFiles.add(filename);
+
+        return outFiles;
     }
 
     private void exportRoutine(InformationSchema is, RoutineDefinition r, String catalogName, String schemaName) {

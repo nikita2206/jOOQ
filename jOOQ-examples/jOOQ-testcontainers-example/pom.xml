@@ -103,6 +103,9 @@
                                 <user>${db.username}</user>
                                 <password>${db.password}</password>
                             </jdbc>
+                            <schemaDefinitionInputs>
+                                <schemaDefinitionInput>${project.basedir}/src/main/resources</schemaDefinitionInput>
+                            </schemaDefinitionInputs>
                             <generator>
                                 <database>
                                     <inputSchema>public</inputSchema>

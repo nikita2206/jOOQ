@@ -422,7 +422,7 @@ public class JavaGenerator extends AbstractGenerator {
     }
 
     @Override
-    public final void generate0(Database db) {
+    public final Set<String> generate0(Database db) {
         this.isoDate = Instant.now().toString();
         this.schemaVersions = new LinkedHashMap<>();
         this.catalogVersions = new LinkedHashMap<>();
@@ -560,7 +560,11 @@ public class JavaGenerator extends AbstractGenerator {
         log.info("Removing excess files");
         empty(getStrategy().getFileRoot(), (scala ? ".scala" : kotlin ? ".kt" : ".java"), affectedFiles, directoriesNotForRemoval);
         directoriesNotForRemoval.clear();
+
+        Set<String> outFiles = affectedFiles.stream().map(File::getPath).collect(Collectors.toSet());
         affectedFiles.clear();
+
+        return outFiles;
     }
 
     private boolean generateCatalogIfEmpty(CatalogDefinition catalog) {

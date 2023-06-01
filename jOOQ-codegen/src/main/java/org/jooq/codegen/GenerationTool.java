@@ -61,10 +61,12 @@ import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -231,17 +233,26 @@ public class GenerationTool {
         new GenerationTool().run(configuration);
     }
 
-    public static void generate(String xml) throws Exception {
-        new GenerationTool().run(load(new ByteArrayInputStream(xml.getBytes(DEFAULT_TARGET_ENCODING))));
+    /**
+     * @return a set of relative file paths of files that were generated
+     */
+    public static Set<String> generate(String xml) throws Exception {
+        return new GenerationTool().run(load(new ByteArrayInputStream(xml.getBytes(DEFAULT_TARGET_ENCODING))));
     }
 
-    public static void generate(Configuration configuration) throws Exception {
-        new GenerationTool().run(configuration);
+    /**
+     * @return a set of relative file paths of files that were generated
+     */
+    public static Set<String> generate(Configuration configuration) throws Exception {
+        return new GenerationTool().run(configuration);
     }
 
-    public void run(Configuration configuration) throws Exception {
+    /**
+     * @return a set of relative file paths of files that were generated
+     */
+    public Set<String> run(Configuration configuration) throws Exception {
         try {
-            run0(configuration);
+            return run0(configuration);
         }
         catch (Exception e) {
             OnError onError = configuration.getOnError();
@@ -258,10 +269,17 @@ public class GenerationTool {
                     throw e;
             }
         }
+
+        return new HashSet<>();
     }
 
+    /**
+     * @return a set of relative file paths of files that were generated
+     */
     @SuppressWarnings({ "unchecked", "unused" })
-    private void run0(Configuration configuration) throws Exception {
+    private Set<String> run0(Configuration configuration) throws Exception {
+        Set<String> outFiles;
+
         // Trigger logging of jOOQ logo eagerly already here
         selectOne().toString();
         boolean propertyOverride = "true".equalsIgnoreCase(System.getProperty("jooq.codegen.propertyOverride"));
@@ -284,7 +302,7 @@ public class GenerationTool {
 
         if (Boolean.getBoolean("jooq.codegen.skip")) {
             log.info("Skipping jOOQ code generation");
-            return;
+            return new HashSet<>();
         }
 
         if (log.isDebugEnabled())
@@ -949,7 +967,7 @@ public class GenerationTool {
             strategy.setUseTableNameForUnambiguousFKs(generator.generateUseTableNameForUnambiguousFKs());
 
             verifyVersions();
-            generator.generate(database);
+            outFiles = generator.generate(database);
 
             if (configuration.getOnUnused() != OnError.SILENT) {
                 boolean anyUnused = false;
@@ -994,6 +1012,8 @@ public class GenerationTool {
                 }
             }
         }
+
+        return outFiles;
     }
 
     private <O> void set(

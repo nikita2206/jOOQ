@@ -44,6 +44,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -186,16 +187,21 @@ abstract class AbstractGenerator implements Generator {
     }
 
     @Override
-    public void generate(Database db) {
+    public Set<String> generate(Database db) {
         this.database = db;
 
         this.database.setIncludeRelations(generateRelations());
         this.database.setTableValuedFunctions(generateTableValuedFunctions());
 
-        generate0(db);
+        return generate0(db);
     }
 
-    protected void generate0(Database db) {}
+    /**
+     * @return a set of relative file paths of files that were generated
+     */
+    protected Set<String> generate0(Database db) {
+        return new HashSet<>();
+    }
 
     void logDatabaseParameters(Database db) {
         String url = "";

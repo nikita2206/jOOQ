@@ -40,6 +40,7 @@ package org.jooq.codegen;
 
 import java.io.Serializable;
 import java.util.Locale;
+import java.util.Set;
 
 import org.jooq.Condition;
 import org.jooq.Constants;
@@ -69,8 +70,9 @@ public interface Generator {
 
     /**
      * Do the code generation
+     * @return a set of relative file paths of files that were generated
      */
-    void generate(Database database);
+    Set<String> generate(Database database);
 
     /**
      * Set a naming strategy to this generator
